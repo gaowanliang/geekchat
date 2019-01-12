@@ -1,0 +1,17 @@
+{
+  "name": "geekchat",
+  "version": "1.0.6",
+  "description": "multi room chat app, powered by socket.io",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "hbs": "^3.1.0",
+    "path": "^0.11.14",
+    "request": "^2.88.0",
+    "socket.io": "^1.7.4",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {},
+  "author": "高玩梁",
+  "license": "ISC"
+}
