@@ -1,556 +1,183 @@
 <!DOCTYPE html>
 <html>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
 
-<head lang="en">
+<head lang="zh">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
     <meta charset="UTF-8">
     <title>{{roomID}}</title>
-    <style>
-        #msglog, #messageInput {
-      border: 1px solid #ccc;
-      margin:0 auto;
-      width:80%;
-      height: 350px;
-      overflow-y: auto;
-      font-size: 14px;
-    }
-    #messageInput {
-      height: 80px;
-    }
-    .message {
-      line-height: 22px;
-    }
-    .message .user {
-      padding-right: 5px;
-      padding-left: 5px;
-      color: #99CC33;
-    }
-    .message .userme {
-      padding-right: 5px;
-      padding-left: 5px;
-      color: #FFCC00;
-    }
-    .message .time {
-      padding-right: 1px;
-      padding-left: 1px;
-      color: #C0C0C0;
-      font-size: 8px;
-    }
-    .sysMsg {
-      color: #c1bfbf;
-      padding-right: 5px;
-      padding-left: 5px;
-      font-size: 12px;
-    }
-    #users {
-      width: 490px;
-      padding: 0 5px 5px;
-    }
-    #jizo {
-      margin:0 auto;
-      width:80%;
-    }
-  </style>
+    <link rel="shortcut icon" href="/img/main.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/zui/1.9.1/css/zui.min.css">
+    <link rel="stylesheet" href="/css/main.min.css">
+    <link rel="stylesheet" href="/css/photoswipe.min.css">
+    <link rel="stylesheet" href="/css/default-skin/default-skin.min.css">
+    <script src="//cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/js/photoswipe.min.js"></script>
+    <script src="/js/photoswipe-ui-default.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="//cdnjs.loli.net/ajax/libs/mdui/0.4.3/css/mdui.min.css">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-145667660-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-145667660-2');
+    </script>
+
 </head>
 
 <body>
-    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
-    <base href="/">
-    <link rel="stylesheet" href="dist/photoswipe.css">
-    <link rel="stylesheet" href="dist/default-skin/default-skin.css">
-    <!-- Core JS file -->
-    <script src="dist/photoswipe.min.js"></script>
-    <!-- UI JS file -->
-    <script src="dist/photoswipe-ui-default.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/jquery.js"></script>
-    <script type="text/javascript">
-    var ip = returnCitySN["cip"];
-    var imgs = [],
-        imgid = 0;
-    </script>
-    <div id="jizo">
-        <span id="fresh">如果你能看见这句话，请刷新或等待网页加载完毕（正常进入会提示输入昵称）</span><br />
-        昵称: <span id="userName"></span> <input type="text" id="userNamein"> <button id="changeName">更改</button> <br />
-        房间: {{roomID}} <br />
-        当前在线人数: <span id="count">{{users.length}}</span> <br />
-        在线用户: <div id="users">{{users}}</div>
-    </div>
-    <div id="msglog">
-    </div>
-    <div style="text-align:center;">
-        <textarea name="message" id="messageInput" wrap="hard"></textarea>
-    </div><br />
-    <div style="text-align:center;">
-        按Enter键发送，也可以
-        <button id="sendMsg">发送</button><br />
-        <form enctype="multipart/form-data">
-            发送图片：<input name="file" type="file" id="file" accept='image/*' />
-        </form>
-                <font color="red">富强，民主，文明，和谐。自由，平等，公正，法治。爱国，敬业，诚信，友善。</font><br />
-                <font color="red">互联网不是法外之地，请谨言慎行</font><br />
-                <br />
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <!-- 导航头部 -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target=".navbar-collapse-example">
+                    <span class="sr-only">切换导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="javascript:;">极客式聊天室v1.0.7</a>
             </div>
-            <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-                <!-- Background of PhotoSwipe. 
-         It's a separate element, as animating opacity is faster than rgba(). -->
-                <div class="pswp__bg"></div>
-                <!-- Slides wrapper with overflow:hidden. -->
-                <div class="pswp__scroll-wrap">
-                    <!-- Container that holds slides. PhotoSwipe keeps only 3 slides in DOM to save memory. -->
-                    <!-- don't modify these 3 pswp__item elements, data is added later on. -->
-                    <div class="pswp__container">
-                        <div class="pswp__item"></div>
-                        <div class="pswp__item"></div>
-                        <div class="pswp__item"></div>
+            <!-- 导航项目 -->
+            <div class="collapse navbar-collapse navbar-collapse-example">
+                <!-- 右侧的导航项目 -->
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">管理<b
+                                class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="javascript:;">测试</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- END .navbar-collapse -->
+        </div>
+    </nav>
+    <div id="jizo">
+        <div class="alert alert-info-inverse with-icon" id="fresh">
+            <i class="icon-info-sign"></i>
+            <div class="content">
+                <p>如果你能看见这个提示，请刷新或等待网页加载完毕（正常进入会提示输入昵称）</p>
+            </div>
+        </div>
+        <div style="width:100%;">
+            <div class="alert alert-danger-inverse alert-dismissable mdui-center">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <p>富强，民主，文明，和谐。自由，平等，公正，法治。爱国，敬业，诚信，友善。</p>
+                <p>互联网不是法外之地，请谨言慎行</p>
+            </div>
+        </div>
+        <button class="btn btn-primary buttoncs" data-toggle="tooltip" data-placement="left" title="点我更改昵称"
+            type="button" id='nick'>我的昵称:<span class="label label-badge" id='userNamed'></span></button>
+        <button class="btn btn-info buttoncs" type="button" data-tip-class="popover-info" data-toggle="popover"
+            data-placement="bottom" data-content="" id='cs' title="在线成员列表">当前在线人数:<span class="label label-badge"
+                id='count'>{{users.length}}</span></button>
+        <button class="btn btn-success buttoncs" type="button">房间：<span class="label label-badge"
+                id='count'>{{roomID}}</span></button>
+    </div>
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                            class="sr-only">关闭</span></button>
+                    <h4 class="modal-title" id='setNick'>设置昵称</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" id='nickInfo'>请设置你的昵称,最大支持20个字符</div>
+                    <div class="mdui-textfield mdui-textfield-floating-label">
+                        <i class="mdui-icon material-icons">account_circle</i>
+                        <label class="mdui-textfield-label">新昵称</label>
+                        <input class="mdui-textfield-input" id="userNamein" maxlength="20" type="text" />
                     </div>
-                    <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-                    <div class="pswp__ui pswp__ui--hidden">
-                        <div class="pswp__top-bar">
-                            <!--  Controls are self-explanatory. Order can be changed. -->
-                            <div class="pswp__counter"></div>
-                            <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-                            <button class="pswp__button pswp__button--share" title="Share"></button>
-                            <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-                            <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-                            <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
-                            <!-- element will get class pswp__preloader--active when preloader is running -->
-                            <div class="pswp__preloader">
-                                <div class="pswp__preloader__icn">
-                                    <div class="pswp__preloader__cut">
-                                        <div class="pswp__preloader__donut"></div>
-                                    </div>
-                                </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="changeName" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="msglog"></div>
+
+    <div style="position:fixed;bottom:0;width:100%;background-color:#ecf0f1;" class="load-indicator"
+        data-loading="正在上传..." id="loadIndicator1">
+        <div class="mdui-container-fluid" style=" margin:0 0;padding: 0 0;">
+            <div class="mdui-col-xs-9 mdui-col-sm-10 mdui-col-md-11">
+                <div class="mdui-textfield mdui-textfield-floating-label" style="padding-top:0;">
+                    <i class="mdui-icon material-icons">textsms</i>
+                    <label class="mdui-textfield-label">Message</label>
+                    <textarea class="mdui-textfield-input" id='messageInput' maxlength="800"></textarea>
+                    <div class="mdui-textfield-helper">可按Enter键发送</div>
+                </div>
+            </div>
+            <div class="mdui-col-xs-3 mdui-col-sm-2 mdui-col-md-1" style="padding-top: 40px;">
+                <form enctype="multipart/form-data" style="float: right">
+                    <input name="file" type="file" id="file" accept='image/*'
+                        style="display: none;visibility: hidden;" />
+                    <button type="button" class="mdui-btn mdui-btn-icon  mdui-color-grey-900 mdui-ripple"
+                        style="margin-left: 2px;" onclick="file.click()"><i
+                            class="mdui-icon material-icons">insert_photo</i></button>
+                </form>
+                <div style="float: right ">
+                    <button class="mdui-btn mdui-btn-icon  mdui-color-grey-900 mdui-ripple" id="sendMsg"><i
+                            class="mdui-icon material-icons">send</i></button></div>
+            </div>
+        </div>
+    </div>
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <!-- Background of PhotoSwipe. 
+         It's a separate element, as animating opacity is faster than rgba(). -->
+        <div class="pswp__bg"></div>
+        <!-- Slides wrapper with overflow:hidden. -->
+        <div class="pswp__scroll-wrap">
+            <!-- Container that holds slides. PhotoSwipe keeps only 3 slides in DOM to save memory. -->
+            <!-- don't modify these 3 pswp__item elements, data is added later on. -->
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <!--  Controls are self-explanatory. Order can be changed. -->
+                    <div class="pswp__counter"></div>
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                    <button class="pswp__button pswp__button--share" title="Share"></button>
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                    <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                    <!-- element will get class pswp__preloader--active when preloader is running -->
+                    <div class="pswp__preloader">
+                        <div class="pswp__preloader__icn">
+                            <div class="pswp__preloader__cut">
+                                <div class="pswp__preloader__donut"></div>
                             </div>
-                        </div>
-                        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                            <div class="pswp__share-tooltip"></div>
-                        </div>
-                        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-                        </button>
-                        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-                        </button>
-                        <div class="pswp__caption">
-                            <div class="pswp__caption__center"></div>
                         </div>
                     </div>
                 </div>
+                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                    <div class="pswp__share-tooltip"></div>
+                </div>
+                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+                </button>
+                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+                </button>
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
             </div>
-            <script>
-            //=============这是图片浏览所需的代码，可以不用管，引入PhotoSwipe=====================
-            var initPhotoSwipeFromDOM = function(gallerySelector) {
-                // parse slide data (url, title, size ...) from DOM elements 
-                // (children of gallerySelector)
-                var parseThumbnailElements = function(el) {
-                    var thumbElements = el.childNodes,
-                        numNodes = thumbElements.length,
-                        items = [],
-                        figureEl,
-                        linkEl,
-                        size,
-                        item;
+        </div>
+    </div>
 
-                    for (var i = 0; i < numNodes; i++) {
-
-                        figureEl = thumbElements[i]; // <figure> element
-
-                        // include only element nodes 
-                        if (figureEl.nodeType !== 1) {
-                            continue;
-                        }
-
-                        linkEl = figureEl.children[0]; // <a> element
-
-                        size = linkEl.getAttribute('data-size').split('x');
-
-                        // create slide object
-                        item = {
-                            src: linkEl.getAttribute('href'),
-                            w: parseInt(size[0], 10),
-                            h: parseInt(size[1], 10)
-                        };
-
-
-
-                        if (figureEl.children.length > 1) {
-                            // <figcaption> content
-                            item.title = figureEl.children[1].innerHTML;
-                        }
-
-                        if (linkEl.children.length > 0) {
-                            // <img> thumbnail element, retrieving thumbnail url
-                            item.msrc = linkEl.children[0].getAttribute('src');
-                        }
-
-                        item.el = figureEl; // save link to element for getThumbBoundsFn
-                        items.push(item);
-                    }
-
-                    return items;
-                };
-
-                // find nearest parent element
-                var closest = function closest(el, fn) {
-                    return el && (fn(el) ? el : closest(el.parentNode, fn));
-                };
-
-                // triggers when user clicks on thumbnail
-                var onThumbnailsClick = function(e) {
-                    e = e || window.event;
-                    e.preventDefault ? e.preventDefault() : e.returnValue = false;
-
-                    var eTarget = e.target || e.srcElement;
-
-                    // find root element of slide
-                    var clickedListItem = closest(eTarget, function(el) {
-                        return (el.tagName && el.tagName.toUpperCase() === 'FIGURE');
-                    });
-
-                    if (!clickedListItem) {
-                        return;
-                    }
-
-                    // find index of clicked item by looping through all child nodes
-                    // alternatively, you may define index via data- attribute
-                    var clickedGallery = clickedListItem.parentNode,
-                        childNodes = clickedListItem.parentNode.childNodes,
-                        numChildNodes = childNodes.length,
-                        nodeIndex = 0,
-                        index;
-
-                    for (var i = 0; i < numChildNodes; i++) {
-                        if (childNodes[i].nodeType !== 1) {
-                            continue;
-                        }
-
-                        if (childNodes[i] === clickedListItem) {
-                            index = nodeIndex;
-                            break;
-                        }
-                        nodeIndex++;
-                    }
-
-
-
-                    if (index >= 0) {
-                        // open PhotoSwipe if valid index found
-                        openPhotoSwipe(index, clickedGallery);
-                    }
-                    return false;
-                };
-
-                // parse picture index and gallery index from URL (#&pid=1&gid=2)
-                var photoswipeParseHash = function() {
-                    var hash = window.location.hash.substring(1),
-                        params = {};
-
-                    if (hash.length < 5) {
-                        return params;
-                    }
-
-                    var vars = hash.split('&');
-                    for (var i = 0; i < vars.length; i++) {
-                        if (!vars[i]) {
-                            continue;
-                        }
-                        var pair = vars[i].split('=');
-                        if (pair.length < 2) {
-                            continue;
-                        }
-                        params[pair[0]] = pair[1];
-                    }
-
-                    if (params.gid) {
-                        params.gid = parseInt(params.gid, 10);
-                    }
-
-                    return params;
-                };
-
-                var openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
-                    var pswpElement = document.querySelectorAll('.pswp')[0],
-                        gallery,
-                        options,
-                        items;
-
-                    items = parseThumbnailElements(galleryElement);
-
-                    // define options (if needed)
-                    options = {
-
-                        // define gallery index (for URL)
-                        galleryUID: galleryElement.getAttribute('data-pswp-uid'),
-
-                        getThumbBoundsFn: function(index) {
-                            // See Options -> getThumbBoundsFn section of documentation for more info
-                            var thumbnail = items[index].el.getElementsByTagName('img')[0], // find thumbnail
-                                pageYScroll = window.pageYOffset || document.documentElement.scrollTop,
-                                rect = thumbnail.getBoundingClientRect();
-
-                            return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
-                        }
-
-                    };
-
-                    // PhotoSwipe opened from URL
-                    if (fromURL) {
-                        if (options.galleryPIDs) {
-                            // parse real index when custom PIDs are used 
-                            // http://photoswipe.com/documentation/faq.html#custom-pid-in-url
-                            for (var j = 0; j < items.length; j++) {
-                                if (items[j].pid == index) {
-                                    options.index = j;
-                                    break;
-                                }
-                            }
-                        } else {
-                            // in URL indexes start from 1
-                            options.index = parseInt(index, 10) - 1;
-                        }
-                    } else {
-                        options.index = parseInt(index, 10);
-                    }
-
-                    // exit if index not found
-                    if (isNaN(options.index)) {
-                        return;
-                    }
-
-                    if (disableAnimation) {
-                        options.showAnimationDuration = 0;
-                    }
-
-                    // Pass data to PhotoSwipe and initialize it
-                    gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
-                    gallery.init();
-                };
-
-                // loop through all gallery elements and bind events
-                var galleryElements = document.querySelectorAll(gallerySelector);
-
-                for (var i = 0, l = galleryElements.length; i < l; i++) {
-                    galleryElements[i].setAttribute('data-pswp-uid', i + 1);
-                    galleryElements[i].onclick = onThumbnailsClick;
-                }
-
-                // Parse URL and open gallery if it contains #&pid=3&gid=1
-                var hashData = photoswipeParseHash();
-                if (hashData.pid && hashData.gid) {
-                    openPhotoSwipe(hashData.pid, galleryElements[hashData.gid - 1], true, true);
-                }
-            };
-            //=============这是图片浏览所需的代码，可以不用管=====================
-            // execute above function
-            //initPhotoSwipeFromDOM('.my-gallery');
-            </script>
-            <script>
-            $(function() {
-                // ----------设置昵称-------------
-                document.getElementById("userNamein").style.display = "none";
-                $('#fresh').text('极客式聊天室v1.0.6'); //style="display:none;"
-                var socket = io(); //<a href="javascript:void(0)" onclick="showImg(this)" id="0">[图片]</a>
-                //alert(ip);
-                var user_name = '';
-                var id = 0; //这个id为每个消息标签的id，被附在每个消息的id上
-                var sysid = 0; //这是系统提示标签的id
-                var urlid1 = 0, //这是url标签的id
-                    urlid2 = 0;
-                var msgno1 = 0, //这是被url标签分割的消息的id
-                    msgno2 = 0;
-
-                user_name = prompt("请设置你的昵称,最大支持20个字符", "");
-                //document.write('你输入了'+msg.length+'个字符');
-                //这里防止昵称为空
-                if (user_name === '' || user_name == null) {
-                    user_name = Math.floor(Math.random() * 100000) + '';
-                }
-
-                if (user_name.length > 20) {
-                    user_name = Math.floor(Math.random() * 100000) + '';
-                }
-                var t = document.getElementById("userNamein");
-                $('#userName').text(user_name);
-                t.value = user_name;
-
-                // ---------创建连接-----------
-
-                // 加入房间
-                socket.on('connect', function() {
-                    socket.emit('join', user_name, ip);;
-                });
-                // 监听消息
-                socket.on('msg', function(userName, msg) {
-                    var myDate = new Date();
-                    if (userName === user_name) {
-                        var message = '' +
-                            '<div class="message">' +
-                            '  <span class="userme" id="user' + id + '"> </span>' +
-                            '  <span class="time">' + myDate.toLocaleTimeString() + '</span>' +
-                            '  <span class="msg" id="msg' + id + '"> ';
-                    } else {
-                        var message = '' +
-                            '<div class="message">' +
-                            '  <span class="user" id="user' + id + '"> </span>' +
-                            '  <span class="time">' + myDate.toLocaleTimeString() + '</span>' +
-                            '  <span class="msg" id="msg' + id + '"> ';
-                    }
-                    var mg = '';
-                    var allurl = msg.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g);
-                    if (allurl !== null) {
-                        var nourlmsg = msg.replace(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g, "⋘");
-                        mg = nourlmsg.split("⋘");
-                        for (var i = 0; i < mg.length; i++) {
-                            message = message.concat('</span><a target="_blank" id="urlid' + urlid1 + '"></a>' + '<span class="msg" id="msgno' + msgno1 + '"> ');
-                            urlid1++;
-                            msgno1++;
-                        }
-                    }
-
-                    message = message.concat('</span></div>');
-                    $('#msglog').append(message);
-
-                    $('#user' + id).text(userName);
-                    if (allurl !== null) {
-                        $('#msg' + id).text(' : ' + mg[0]);
-                        for (var i = 0; i < mg.length; i++) {
-                            document.getElementById("urlid" + urlid2).setAttribute('href', allurl[i]);
-                            $('#urlid' + urlid2).text(allurl[i]);
-                            urlid2++;
-                        }
-                        for (var i = 1; i <= mg.length; i++) {
-                            $('#msgno' + msgno2).text(mg[i]);
-                            msgno2++;
-                        }
-                    } else {
-                        $('#msg' + id).text(' : ' + msg);
-                    }
-
-                    id++;
-                    $('#msglog').scrollTop($('#msglog')[0].scrollHeight); // 滚动条保持最下方
-                });
-
-                //监听图片消息
-                socket.on('img', function(userName, img, w, h) {
-                    var myDate = new Date();
-                    if (userName === user_name) {
-                        var message = '' +
-                            '<div class="message" class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">' +
-                            '  <span class="userme" id="user' + id + '"> </span>' +
-                            '  <span class="time">' + myDate.toLocaleTimeString() + '</span>' +
-                            '<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">' +
-                            '<figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">' +
-                            '  <a href="' + img + '" itemprop="contentUrl" data-size="' + w + 'x' + h + '"> _[点击查看图片]' +
-                            ' <img src="' + img + '" itemprop="thumbnail" alt="Image description" style="width: 0px;height: 0px"/></a></figure></div></div>';
-                    } else {
-                        var message = '' +
-                            '<div class="message">' +
-                            '  <span class="user" id="user' + id + '"> </span>' +
-                            '  <span class="time">' + myDate.toLocaleTimeString() + '</span>' +
-                            '<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">' +
-                            '<figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">' +
-                            '  <a href="' + img + '" itemprop="contentUrl" data-size="' + w + 'x' + h + '"> _[点击查看图片]' +
-                            ' <img src="' + img + '" itemprop="thumbnail" alt="Image description" style="width: 0px;height: 0px"/></a></figure></div></div>';
-                    }
-                    imgid++;
-                    $('#msglog').append(message);
-                    $('#user' + id).text(userName);
-                    id++;
-                    $('#msglog').scrollTop($('#msglog')[0].scrollHeight);
-                    initPhotoSwipeFromDOM('.my-gallery');//初始化PhotoSwipe插件
-                });
-
-                // 监听系统消息
-                socket.on('sys', function(sysMsg, users) {
-                    var message = '' +
-                        '<div class="sysMsg">' +
-                        '  <span class="sysMsg" id="sys' + sysid + '"> </span> </div>';
-                    $('#msglog').append(message);
-                    $('#sys' + sysid).text(sysMsg);
-                    sysid++;
-                    $('#count').text(users.length);
-                    $('#users').text(users);
-                });
-                // ---------------发送图片--------------------
-                $(':input').change(function() {
-                    var f = this.files[0];
-                    var formData = new FormData();
-                    formData.append('smfile', f);
-
-                    $.ajax({
-                        url: 'https://sm.ms/api/upload',
-                        type: 'POST',
-                        success: function(data) {
-                            socket.emit('messageimg', JSON.stringify(data.data.url).replace(/"/g, ''), JSON.stringify(data.data.delete).replace(/"/g, ''), JSON.stringify(data.data.width), JSON.stringify(data.data.height));
-                            alert("图片上传成功，请耐心等待");
-                        },
-                        error: function(data) {
-                            alert("图片上传失败");
-                        },
-
-                        data: formData,
-                        cache: false,
-                        contentType: false,
-                        processData: false
-
-                    });
-                });
-
-                // ---------------发送消息--------------------
-                $('#messageInput').keydown(function(e) {
-                    if (e.which === 13 || e.which === 10) {
-                        e.preventDefault();
-                        var msg = $(this).val();
-                        if (msg.replace(/ /g, '') !== '') {
-                            if (msg.length < 180) {
-                                $(this).val('');
-                                socket.send(msg);
-                            } else {
-                                alert('你输入了' + msg.length + '个字符，最大支持180个字符');
-                            }
-
-                        }
-                    }
-                });
-
-                $('#sendMsg').click(function(event) {
-                    event.preventDefault();
-                    var msg = $('#messageInput').val();
-                    if (msg.replace(/ /g, '') !== '') {
-                        if (msg.length < 180) {
-                            $('#messageInput').val('');
-                            socket.send(msg);
-                        } else {
-                            alert('你输入了' + msg.length + '个字符，最大支持180个字符');
-                        }
-
-                    }
-                });
-
-                // ---------------改名--------------------
-                $('#changeName').click(function(event) {
-                    if ($(this).text() === '更改') {
-                        $(this).text('确定');
-                        document.getElementById("userName").style.display = "none";
-                        document.getElementById("userNamein").style.display = "inline";
-                    } else {
-                        var t = document.getElementById("userNamein");
-                        var y = document.getElementById("userName");
-                        if (t.value !== '') {
-                            if (t.value.length < 20) {
-                                socket.emit('change_name', y.innerText, t.value);
-                                document.getElementById("userName").style.display = "inline";
-                                document.getElementById("userNamein").style.display = "none";
-                                user_name = t.value;
-                                $('#userName').text(user_name);
-                                $(this).text('更改');
-                            }
-                        }
-                    }
-
-                });
-
-            });
-            </script>
+    <script src="/js/main.min.js"></script>
+    <script src="/js/image-compressor.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zui/1.9.1/js/zui.min.js"></script>
+    <script src="//cdnjs.loli.net/ajax/libs/mdui/0.4.3/js/mdui.min.js"></script>
 </body>
 
 </html>
